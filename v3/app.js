@@ -1,7 +1,12 @@
 var express     = require("express"),
     app         = express(),
     bodyParser  = require("body-parser"),
-    mongoose    = require("mongoose");
+    mongoose    = require("mongoose"),
+    Campground  = require("./models/campground"),
+    seedDB      = require("./seeds");
+    
+// start the seeds file - removes all campgrounds.
+seedDB();
 
 mongoose.Promise = global.Promise; 
 
@@ -15,29 +20,8 @@ app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 
 
-// Schema setup
-var campgroundSchema = new mongoose.Schema({
-    name: String,
-    image: String,
-    description: String
-});
 
-var Campground = mongoose.model("Campground", campgroundSchema);
 
-// Campground.create(
-//     {
-//         name: "Stars Scars Creek", 
-//         image: "https://cdn.pixabay.com/photo/2017/07/31/22/54/night-2561809_960_720.jpg",
-//         description: "Campground wih scarred ground from fallen stars of the past."
-        
-//     }, function(err, campground) {
-//         if(err) {
-//             console.log(err);
-//         } else {
-//             console.log("Newly created campground");
-//             console.log(campground);
-//         }
-//     });
 
 // Root route/Landing Page
 app.get("/", function(req, res) {
@@ -82,10 +66,11 @@ app.get("/campgrounds/new", function(req, res) {
 // SHOW route - shows info about one campground
 app.get("/campgrounds/:id", function(req, res) {
     // find the campground with provided id
-    Campground.findById(req.params.id, function(err, foundCampground) {
+    Campground.findById(req.params.id).populate("comments").exec(function(err, foundCampground) {
       if(err) {
           console.log("error");
       } else {
+          console.log(foundCampground)
         // render show template with that campground id
         res.render("show", {campground: foundCampground});
       }  
