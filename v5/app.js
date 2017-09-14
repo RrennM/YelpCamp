@@ -20,6 +20,9 @@ app.use(bodyParser.urlencoded({extended: true}));
 // This line keeps us from having to use the .ejs extensino on every file.
 app.set("view engine", "ejs");
 
+// link css - serve directory
+app.use(express.static(__dirname + "/public"));
+
 
 // ROOT route/Landing Page
 app.get("/", function(req, res) {
